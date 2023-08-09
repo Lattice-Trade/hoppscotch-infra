@@ -1,0 +1,26 @@
+name: "1. Deploy to develop in EKS"
+
+on:
+  pull_request_target:
+    types:
+      - closed
+    paths:
+      - 'packages/hoppscotch-backend/**'
+  push:
+    paths:
+      - 'packages/hoppscotch-backend/**'
+    
+jobs:
+  build:
+    uses: Lattice-Trade/membrane-github-template-actions/.github/workflows/typescript-docker-build.v2.yml@main
+    with:
+      GH_BRANCH_NAME: develop
+      ECR_REPOSITORY: ${{ vars.MICROSERVICE_NAME }}
+      GH_PR_MERGED: ${{ github.event.pull_request.merged }}
+      HAS_UNIT_TEST: ${{ vars.HAS_TESTS == 'true' }}
+      NODE_VERSION: ${{ vars.NODE_VERSION }}
+      GH_SHA: dev-${{ github.sha }}
+      SLACK_CHANNEL: dev-releases
+      GH_ENV: develop
+      WORKING_DIR: ${{ vars.WORKING_DIR }}
+    secrets: inherit
